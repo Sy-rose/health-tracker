@@ -1,0 +1,32 @@
+android {
+    namespace "com.example.flutter_firebase_Setup"
+    compileSdkVersion 33 // Set this to the latest stable version
+    ndkVersion flutter.ndkVersion
+
+    defaultConfig {
+        applicationId "com.example.health_metrics_tracker" // Set your unique app ID
+        minSdkVersion 23 // Explicitly set to 23
+        targetSdkVersion 33 // Align with compileSdkVersion
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug // Replace with your release signing config
+        }
+    }
+}
