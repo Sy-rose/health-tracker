@@ -27,7 +27,7 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
   bool _isPerforming = false;
 
   List<Map<String, dynamic>> patients = []; // List of patients from Firestore
-  
+
   @override
   void initState() {
     super.initState();
@@ -37,7 +37,8 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
   // Function to fetch patients from Firestore
   Future<void> _fetchPatients() async {
     try {
-      var snapshot = await FirebaseFirestore.instance.collection('patients').get();
+      var snapshot =
+          await FirebaseFirestore.instance.collection('patients').get();
       setState(() {
         patients = snapshot.docs
             .map((doc) => {'id': doc.id, 'name': doc['name']})
@@ -123,9 +124,11 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
                       ),
                       const SizedBox(height: 8),
                       // Text Fields for Health Metrics
-                      _buildNumericInputField("systolicBP", "Systolic Blood Pressure"),
+                      _buildNumericInputField(
+                          "systolicBP", "Systolic Blood Pressure"),
                       const SizedBox(height: 8),
-                      _buildNumericInputField("diastolicBP", "Diastolic Blood Pressure"),
+                      _buildNumericInputField(
+                          "diastolicBP", "Diastolic Blood Pressure"),
                       const SizedBox(height: 8),
                       _buildNumericInputField("heartRate", "Heart Rate"),
                       const SizedBox(height: 8),
@@ -163,7 +166,8 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
                         onPressed: _isPerforming
                             ? null
                             : () {
-                                if (_formKey.currentState?.saveAndValidate() ?? false) {
+                                if (_formKey.currentState?.saveAndValidate() ??
+                                    false) {
                                   final inputs = _formKey.currentState!.value;
 
                                   setState(() {
@@ -174,18 +178,26 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
                                     id: '',
                                     patientId: inputs["patientId"].toString(),
                                     date: inputs["date"] as DateTime,
-                                    systolicBP: double.parse(inputs["systolicBP"].toString()),
-                                    diastolicBP: double.parse(inputs["diastolicBP"].toString()),
-                                    heartRate: double.parse(inputs["heartRate"].toString()),
-                                    weight: double.parse(inputs["weight"].toString()),
-                                    bloodSugar: double.parse(inputs["bloodSugar"].toString()),
+                                    systolicBP: double.parse(
+                                        inputs["systolicBP"].toString()),
+                                    diastolicBP: double.parse(
+                                        inputs["diastolicBP"].toString()),
+                                    heartRate: double.parse(
+                                        inputs["heartRate"].toString()),
+                                    weight: double.parse(
+                                        inputs["weight"].toString()),
+                                    bloodSugar: double.parse(
+                                        inputs["bloodSugar"].toString()),
                                   );
 
-                                  context.read<HealthMetricCubit>().addHealthMetric(newHealthMetric);
+                                  context
+                                      .read<HealthMetricCubit>()
+                                      .addHealthMetric(newHealthMetric);
                                 }
                               },
                         child: _isPerforming
-                            ? const CircularProgressIndicator(color: Colors.white)
+                            ? const CircularProgressIndicator(
+                                color: Colors.white)
                             : const Text('Save'),
                       ),
                     ),

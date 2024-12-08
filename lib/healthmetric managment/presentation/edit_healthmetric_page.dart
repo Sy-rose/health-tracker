@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,7 +5,6 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:health_metrics_tracker/healthmetric%20managment/domain/entities/health_metric.dart';
 import 'package:health_metrics_tracker/healthmetric%20managment/presentation/cubit/health_metric_cubit.dart';
-
 
 class EditHealthMetricPage extends StatefulWidget {
   final HealthMetric healthMetric;
@@ -57,9 +54,13 @@ class _EditHealthMetricPageState extends State<EditHealthMetricPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Health Metric"),
+        title: const Text(
+          "Edit Health Metric",
+          style: TextStyle(color: Colors.white), // Set text color to white
+        ),
         backgroundColor: Colors.blue,
-        
+        iconTheme: const IconThemeData(
+            color: Colors.white), // Ensures back icon is white
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -74,6 +75,7 @@ class _EditHealthMetricPageState extends State<EditHealthMetricPage> {
                   padding: const EdgeInsets.all(8.0),
                   children: [
                     FormBuilderDropdown<String>(
+                      // Patient dropdown
                       name: "patientId",
                       decoration: InputDecoration(
                         labelText: "Patient",
@@ -92,7 +94,9 @@ class _EditHealthMetricPageState extends State<EditHealthMetricPage> {
                       validator: FormBuilderValidators.required(),
                     ),
                     const SizedBox(height: 8),
+
                     FormBuilderDateTimePicker(
+                      // Date picker
                       name: "date",
                       decoration: InputDecoration(
                         labelText: 'Date of Registered',
@@ -104,101 +108,101 @@ class _EditHealthMetricPageState extends State<EditHealthMetricPage> {
                       inputType: InputType.date,
                     ),
                     const SizedBox(height: 8),
-                    // Add other form fields for BP, heart rate, weight, etc.
-                    // systolic BP
-                      FormBuilderTextField(
-                        name: "systolicBP",
-                        decoration: InputDecoration(
-                          labelText: "Systolic BP",
-                          labelStyle: TextStyle(color: Colors.blue),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        initialValue: initialValues["systolicBP"].toString(),
-                        keyboardType: TextInputType.number,
-                        validator: FormBuilderValidators.compose([
-                          FormBuilderValidators.required(),
-                          FormBuilderValidators.numeric(),
-                        ]),
-                      ),
-                      const SizedBox(height: 8), // Add margin
 
-                      // diastolic BP
-                      FormBuilderTextField(
-                        name: "diastolicBP",
-                        decoration: InputDecoration(
-                          labelText: "Diastolic BP",
-                          labelStyle: TextStyle(color: Colors.blue),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                    // Systolic BP
+                    FormBuilderTextField(
+                      name: "systolicBP",
+                      decoration: InputDecoration(
+                        labelText: "Systolic BP",
+                        labelStyle: TextStyle(color: Colors.blue),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        initialValue: initialValues["diastolicBP"].toString(),
-                        keyboardType: TextInputType.number,
-                        validator: FormBuilderValidators.compose([
-                          FormBuilderValidators.required(),
-                          FormBuilderValidators.numeric(),
-                        ]),
                       ),
-                      const SizedBox(height: 8), // Add margin
+                      initialValue: initialValues["systolicBP"].toString(),
+                      keyboardType: TextInputType.number,
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(),
+                        FormBuilderValidators.numeric(),
+                      ]),
+                    ),
+                    const SizedBox(height: 8),
 
-                      // heart rate
-                      FormBuilderTextField(
-                        name: "heartRate",
-                        decoration: InputDecoration(
-                          labelText: "Heart Rate",
-                          labelStyle: TextStyle(color: Colors.blue),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                    // Diastolic BP
+                    FormBuilderTextField(
+                      name: "diastolicBP",
+                      decoration: InputDecoration(
+                        labelText: "Diastolic BP",
+                        labelStyle: TextStyle(color: Colors.blue),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        initialValue: initialValues["heartRate"].toString(),
-                        keyboardType: TextInputType.number,
-                        validator: FormBuilderValidators.compose([
-                          FormBuilderValidators.required(),
-                          FormBuilderValidators.numeric(),
-                        ]),
                       ),
-                      const SizedBox(height: 8), // Add margin
+                      initialValue: initialValues["diastolicBP"].toString(),
+                      keyboardType: TextInputType.number,
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(),
+                        FormBuilderValidators.numeric(),
+                      ]),
+                    ),
+                    const SizedBox(height: 8),
 
-                      // weight
-                      FormBuilderTextField(
-                        name: "weight",
-                        decoration: InputDecoration(
-                          labelText: "Weight",
-                          labelStyle: TextStyle(color: Colors.blue),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                    // Heart rate
+                    FormBuilderTextField(
+                      name: "heartRate",
+                      decoration: InputDecoration(
+                        labelText: "Heart Rate",
+                        labelStyle: TextStyle(color: Colors.blue),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        initialValue: initialValues["weight"].toString(),
-                        keyboardType: TextInputType.number,
-                        validator: FormBuilderValidators.compose([
-                          FormBuilderValidators.required(),
-                          FormBuilderValidators.numeric(),
-                        ]),
                       ),
-                      const SizedBox(height: 8), // Add margin
+                      initialValue: initialValues["heartRate"].toString(),
+                      keyboardType: TextInputType.number,
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(),
+                        FormBuilderValidators.numeric(),
+                      ]),
+                    ),
+                    const SizedBox(height: 8),
 
-                      // blood sugar
-                      FormBuilderTextField(
-                        name: "bloodSugar",
-                        decoration: InputDecoration(
-                          labelText: "Blood Sugar",
-                          labelStyle: TextStyle(color: Colors.blue),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                    // Weight
+                    FormBuilderTextField(
+                      name: "weight",
+                      decoration: InputDecoration(
+                        labelText: "Weight",
+                        labelStyle: TextStyle(color: Colors.blue),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        initialValue: initialValues["bloodSugar"].toString(),
-                        keyboardType: TextInputType.number,
-                        validator: FormBuilderValidators.compose([
-                          FormBuilderValidators.required(),
-                          FormBuilderValidators.numeric(),
-                        ]),
                       ),
-                      const SizedBox(height: 8), // Add margin
+                      initialValue: initialValues["weight"].toString(),
+                      keyboardType: TextInputType.number,
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(),
+                        FormBuilderValidators.numeric(),
+                      ]),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Blood Sugar
+                    FormBuilderTextField(
+                      name: "bloodSugar",
+                      decoration: InputDecoration(
+                        labelText: "Blood Sugar",
+                        labelStyle: TextStyle(color: Colors.blue),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      initialValue: initialValues["bloodSugar"].toString(),
+                      keyboardType: TextInputType.number,
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(),
+                        FormBuilderValidators.numeric(),
+                      ]),
+                    ),
+                    const SizedBox(height: 8),
                   ],
                 ),
               ),
@@ -248,16 +252,17 @@ class _EditHealthMetricPageState extends State<EditHealthMetricPage> {
                             heartRate: double.tryParse(
                                     inputs["heartRate"].toString()) ??
                                 0.0,
-                            weight: double.tryParse(
-                                    inputs["weight"].toString()) ??
-                                0.0,
+                            weight:
+                                double.tryParse(inputs["weight"].toString()) ??
+                                    0.0,
                             bloodSugar: double.tryParse(
                                     inputs["bloodSugar"].toString()) ??
                                 0.0,
                           );
 
-                          context.read<HealthMetricCubit>().editHealthMetric(
-                              updatedHealthMetric);
+                          context
+                              .read<HealthMetricCubit>()
+                              .editHealthMetric(updatedHealthMetric);
                         }
                       },
                       style: ElevatedButton.styleFrom(

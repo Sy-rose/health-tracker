@@ -36,6 +36,4 @@ class HealthMetric extends Equatable {
         bloodSugar,
       ];
 
-
-
 }

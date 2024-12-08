@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_metrics_tracker/core/services/injection_container.dart';
 import 'package:health_metrics_tracker/core/widgets/empty_state_list.dart';
-import 'package:health_metrics_tracker/core/widgets/error_state_list.dart';
+import 'package:health_metrics_tracker/patient%20management/presentation/add_patient_page.dart';
 import 'package:health_metrics_tracker/patient%20management/presentation/cubit/patient_cubit.dart';
 import 'package:health_metrics_tracker/patient%20management/presentation/cubit/patient_state.dart';
-import 'package:health_metrics_tracker/patient%20management/presentation/edit_patient_page.dart';
-import 'package:health_metrics_tracker/patient%20management/presentation/add_patient_page.dart';
 import 'package:health_metrics_tracker/patient%20management/presentation/delete_patient_page.dart';
+import 'package:health_metrics_tracker/patient%20management/presentation/edit_patient_page.dart';
 import 'package:health_metrics_tracker/patient%20management/presentation/viewpatientpage.dart';
 
 class ViewAllPatientsPage extends StatefulWidget {
@@ -18,10 +17,14 @@ class ViewAllPatientsPage extends StatefulWidget {
 }
 
 class _ViewAllPatientsPageState extends State<ViewAllPatientsPage> {
+  late PatientCubit _patientCubit;
+
   @override
-  void initState() {
-    super.initState();
-    context.read<PatientCubit>().fetchAllPatients();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Safely initialize the cubit by using didChangeDependencies
+    _patientCubit = context.read<PatientCubit>();
+    _patientCubit.fetchAllPatients();
   }
 
   @override
@@ -106,7 +109,7 @@ class _ViewAllPatientsPageState extends State<ViewAllPatientsPage> {
                             ).then((shouldRefresh) {
                               if (shouldRefresh == true) {
                                 // Refresh the list of patients
-                                context.read<PatientCubit>().fetchAllPatients();
+                                _patientCubit.fetchAllPatients();
                               }
                             });
                           },
@@ -114,7 +117,6 @@ class _ViewAllPatientsPageState extends State<ViewAllPatientsPage> {
                         IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () {
-                            // Inside ViewAllPatientsPage
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -124,8 +126,7 @@ class _ViewAllPatientsPageState extends State<ViewAllPatientsPage> {
                                 ),
                               ),
                             ).then((_) {
-                              // This will refresh the list when you come back from DeletePatientPage
-                              context.read<PatientCubit>().fetchAllPatients();
+                              _patientCubit.fetchAllPatients();
                             });
                           },
                         ),
@@ -144,20 +145,11 @@ class _ViewAllPatientsPageState extends State<ViewAllPatientsPage> {
                 );
               },
             );
-          } else if (state is PatientError) {
-            return ErrorStateList(
-              imageAssetName: 'assets/images/error.png',
-              errorMessage: state.message,
-              onRetry: () {
-                context.read<PatientCubit>().fetchAllPatients();
-              },
-              message: 'An error occurred while loading the patients.',
-            );
           } else {
             return const EmptyStateList(
               imageAssetName: 'assets/Designer.png',
               title: 'No Patients Found',
-              description: 'Please add new patients to the system.',
+              description: 'Please add new patients.',
             );
           }
         },
@@ -174,8 +166,7 @@ class _ViewAllPatientsPageState extends State<ViewAllPatientsPage> {
             ),
           );
           if (result == true) {
-            // Refresh the patient list after adding a new patient
-            context.read<PatientCubit>().fetchAllPatients();
+            _patientCubit.fetchAllPatients();
           }
         },
         backgroundColor: Colors.blue,

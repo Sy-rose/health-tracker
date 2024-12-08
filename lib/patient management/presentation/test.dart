@@ -1,48 +1,31 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:health_metrics_tracker/core/services/injection_container.dart';
 import 'package:health_metrics_tracker/core/widgets/empty_state_list.dart';
 import 'package:health_metrics_tracker/core/widgets/error_state_list.dart';
-import 'package:health_metrics_tracker/healthmetric%20managment/presentation/add_healthmetric_page.dart';
-import 'package:health_metrics_tracker/healthmetric%20managment/presentation/cubit/health_metric_cubit.dart';
-import 'package:health_metrics_tracker/healthmetric%20managment/presentation/cubit/health_metric_state.dart';
-import 'package:health_metrics_tracker/healthmetric%20managment/presentation/delete_health_metric_page.dart';
-import 'package:health_metrics_tracker/healthmetric%20managment/presentation/edit_healthmetric_page.dart';
-import 'package:health_metrics_tracker/healthmetric%20managment/presentation/view_health_metric_details_page.dart';
-import 'package:intl/intl.dart';
+import 'package:health_metrics_tracker/patient%20management/presentation/add_patient_page.dart';
+import 'package:health_metrics_tracker/patient%20management/presentation/cubit/patient_cubit.dart';
+import 'package:health_metrics_tracker/patient%20management/presentation/cubit/patient_state.dart';
+import 'package:health_metrics_tracker/patient%20management/presentation/delete_patient_page.dart';
+import 'package:health_metrics_tracker/patient%20management/presentation/edit_patient_page.dart';
+import 'package:health_metrics_tracker/patient%20management/presentation/viewpatientpage.dart';
 
-class ViewAllHealthMetricsPage extends StatefulWidget {
-  const ViewAllHealthMetricsPage({Key? key}) : super(key: key);
+class ViewAllPatientsPage extends StatefulWidget {
+  const ViewAllPatientsPage({super.key});
 
   @override
-  State<ViewAllHealthMetricsPage> createState() =>
-      _ViewAllHealthMetricsPageState();
+  State<ViewAllPatientsPage> createState() => _ViewAllPatientsPageState();
 }
 
-class _ViewAllHealthMetricsPageState extends State<ViewAllHealthMetricsPage> {
-  late HealthMetricCubit _healthMetricCubit;
-  Map<String, String> patientIdToName = {};
+class _ViewAllPatientsPageState extends State<ViewAllPatientsPage> {
+  late PatientCubit _patientCubit;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _healthMetricCubit = context.read<HealthMetricCubit>();
-    _healthMetricCubit.getAllHealthMetrics();
-    _fetchPatients();
-  }
-
-  Future<void> _fetchPatients() async {
-    try {
-      var snapshot =
-          await FirebaseFirestore.instance.collection('patients').get();
-      setState(() {
-        patientIdToName = {
-          for (var doc in snapshot.docs) doc.id: doc['name'] as String,
-        };
-      });
-    } catch (e) {
-      print("Error fetching patients: $e");
-    }
+    // Safely initialize the cubit by using didChangeDependencies
+    _patientCubit = context.read<PatientCubit>();
+    _patientCubit.fetchAllPatients();
   }
 
   @override
@@ -51,39 +34,45 @@ class _ViewAllHealthMetricsPageState extends State<ViewAllHealthMetricsPage> {
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Image.asset('assets/Designer.png', height: 30, width: 30),
+          child: Image.asset(
+            'assets/Designer.png',
+            height: 30,
+            width: 30,
+          ),
         ),
         title: const Text(
-          "Health Metrics",
+          "Patients",
           style: TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
         backgroundColor: Colors.blue,
         elevation: 5,
       ),
-      body: BlocBuilder<HealthMetricCubit, HealthMetricState>(
+      body: BlocBuilder<PatientCubit, PatientState>(
         builder: (context, state) {
-          if (state is HealthMetricLoading) {
+          if (state is PatientLoading) {
             return const Center(child: CircularProgressIndicator());
-          } else if (state is HealthMetricLoaded) {
-            if (state.healthMetrics.isEmpty) {
+          } else if (state is PatientLoaded) {
+            if (state.patients.isEmpty) {
               return const EmptyStateList(
                 imageAssetName: 'assets/Designer.png',
-                title: 'No Health Metrics Found',
-                description: 'Please add new health metrics.',
+                title: 'No Patients Found',
+                description: 'Please add new patients.',
               );
             }
 
-            final reversedMetrics = List.from(state.healthMetrics.reversed);
+            // Reverse the patient list to show last added at the bottom
+            final reversedPatients = List.from(state.patients.reversed);
 
             return ListView.builder(
               padding: const EdgeInsets.all(8.0),
-              itemCount: reversedMetrics.length,
+              itemCount: reversedPatients.length,
               itemBuilder: (context, index) {
-                final metric = reversedMetrics[index];
-                String patientName =
-                    patientIdToName[metric.patientId] ?? 'Unknown Patient';
+                final patient = reversedPatients[index];
 
                 return Card(
                   margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -95,14 +84,15 @@ class _ViewAllHealthMetricsPageState extends State<ViewAllHealthMetricsPage> {
                     contentPadding: const EdgeInsets.symmetric(
                         vertical: 15.0, horizontal: 20.0),
                     title: Text(
-                      patientName,
+                      patient.name,
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.blue),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.blue,
+                      ),
                     ),
                     subtitle: Text(
-                      'Date: ${DateFormat('yyyy-MM-dd').format(metric.date)}',
+                      '${patient.age} years old',
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     trailing: Row(
@@ -115,11 +105,12 @@ class _ViewAllHealthMetricsPageState extends State<ViewAllHealthMetricsPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    EditHealthMetricPage(healthMetric: metric),
+                                    EditPatientPage(patient: patient),
                               ),
                             ).then((shouldRefresh) {
                               if (shouldRefresh == true) {
-                                _healthMetricCubit.getAllHealthMetrics();
+                                // Refresh the list of patients
+                                _patientCubit.fetchAllPatients();
                               }
                             });
                           },
@@ -130,11 +121,13 @@ class _ViewAllHealthMetricsPageState extends State<ViewAllHealthMetricsPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => DeleteHealthMetricPage(
-                                    healthMetric: metric),
+                                builder: (context) => DeletePatientPage(
+                                  patient: patient,
+                                  patientId: patient.id,
+                                ),
                               ),
                             ).then((_) {
-                              _healthMetricCubit.getAllHealthMetrics();
+                              _patientCubit.fetchAllPatients();
                             });
                           },
                         ),
@@ -144,10 +137,8 @@ class _ViewAllHealthMetricsPageState extends State<ViewAllHealthMetricsPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ViewHealthMetricDetailsPage(
-                            healthMetric: metric,
-                            patientName: patientName,
-                          ),
+                          builder: (context) =>
+                              ViewPatientDetailsPage(patient: patient),
                         ),
                       );
                     },
@@ -155,20 +146,20 @@ class _ViewAllHealthMetricsPageState extends State<ViewAllHealthMetricsPage> {
                 );
               },
             );
-          } else if (state is HealthMetricError) {
+          } else if (state is PatientError) {
             return ErrorStateList(
               imageAssetName: 'assets/images/error.png',
               errorMessage: state.message,
               onRetry: () {
-                _healthMetricCubit.getAllHealthMetrics();
+                _patientCubit.fetchAllPatients();
               },
-              message: 'An error occurred while loading the health metrics.',
+              message: 'An error occurred while loading the patients.',
             );
           } else {
             return const EmptyStateList(
               imageAssetName: 'assets/Designer.png',
-              title: 'No Health Metrics Found',
-              description: 'Please add new health metrics.',
+              title: 'No Patients Found',
+              description: 'Please add new patients to the system.',
             );
           }
         },
@@ -178,11 +169,14 @@ class _ViewAllHealthMetricsPageState extends State<ViewAllHealthMetricsPage> {
           final result = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const AddHealthMetricPage(),
+              builder: (context) => BlocProvider(
+                create: (context) => serviceLocator<PatientCubit>(),
+                child: const AddPatientPage(),
+              ),
             ),
           );
           if (result == true) {
-            _healthMetricCubit.getAllHealthMetrics();
+            _patientCubit.fetchAllPatients();
           }
         },
         backgroundColor: Colors.blue,

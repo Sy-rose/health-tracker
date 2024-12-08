@@ -19,8 +19,8 @@ class ViewHealthMetricDetailsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Patient",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          "Health Metric Patient",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
         ),
         backgroundColor: Colors.blue,
         centerTitle: true,
