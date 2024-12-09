@@ -27,6 +27,7 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
   bool _isPerforming = false;
 
   List<Map<String, dynamic>> patients = []; // List of patients from Firestore
+  bool _isFetchingPatients = false;
 
   @override
   void initState() {
@@ -36,6 +37,10 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
 
   // Function to fetch patients from Firestore
   Future<void> _fetchPatients() async {
+    setState(() {
+      _isFetchingPatients = true; // Show loading indicator for patient fetch
+    });
+
     try {
       var snapshot =
           await FirebaseFirestore.instance.collection('patients').get();
@@ -46,6 +51,10 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
       });
     } catch (e) {
       print("Error fetching patients: $e");
+    } finally {
+      setState(() {
+        _isFetchingPatients = false; // Stop loading indicator
+      });
     }
   }
 
@@ -60,7 +69,7 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
               backgroundColor: Colors.green,
             ),
           );
-          Navigator.pop(context); // Pop the screen after adding
+          Navigator.pop(context, true); // Pop and trigger refresh
         } else if (state is HealthMetricError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -84,60 +93,64 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: FormBuilder(
-                  key: _formKey,
-                  child: ListView(
-                    padding: const EdgeInsets.all(8.0),
-                    children: [
-                      // Dropdown for selecting patient
-                      FormBuilderDropdown<String>(
-                        name: "patientId",
-                        decoration: InputDecoration(
-                          labelText: "Patient",
-                          labelStyle: const TextStyle(color: Colors.blue),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                child: _isFetchingPatients
+                    ? const Center(child: CircularProgressIndicator())
+                    : FormBuilder(
+                        key: _formKey,
+                        child: ListView(
+                          padding: const EdgeInsets.all(8.0),
+                          children: [
+                            // Dropdown for selecting patient
+                            FormBuilderDropdown<String>(
+                              name: "patientId",
+                              decoration: InputDecoration(
+                                labelText: "Patient",
+                                labelStyle: const TextStyle(color: Colors.blue),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              hint: const Text('Select Patient'),
+                              items: patients
+                                  .map((patient) => DropdownMenuItem<String>(
+                                        value: patient['id'],
+                                        child: Text(
+                                            capitalizeName(patient['name'])),
+                                      ))
+                                  .toList(),
+                              validator: FormBuilderValidators.required(),
+                            ),
+                            const SizedBox(height: 16.0), // Corrected SizedBox
+                            // Date Picker for health metric date
+                            FormBuilderDateTimePicker(
+                              name: "date",
+                              decoration: InputDecoration(
+                                labelText: 'Date of Registration',
+                                labelStyle: const TextStyle(color: Colors.blue),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              inputType: InputType.date,
+                              validator: FormBuilderValidators.required(),
+                            ),
+                            const SizedBox(height: 16.0), // Corrected SizedBox
+                            // Text Fields for Health Metrics
+                            _buildNumericInputField(
+                                "systolicBP", "Systolic Blood Pressure"),
+                            const SizedBox(height: 16.0), // Corrected SizedBox
+                            _buildNumericInputField(
+                                "diastolicBP", "Diastolic Blood Pressure"),
+                            const SizedBox(height: 16.0), // Corrected SizedBox
+                            _buildNumericInputField("heartRate", "Heart Rate"),
+                            const SizedBox(height: 16.0), // Corrected SizedBox
+                            _buildNumericInputField("weight", "Weight"),
+                            const SizedBox(height: 16.0), // Corrected SizedBox
+                            _buildNumericInputField(
+                                "bloodSugar", "Blood Sugar"),
+                          ],
                         ),
-                        hint: const Text('Select Patient'),
-                        items: patients
-                            .map((patient) => DropdownMenuItem<String>(
-                                  value: patient['id'],
-                                  child: Text(capitalizeName(patient['name'])),
-                                ))
-                            .toList(),
-                        validator: FormBuilderValidators.required(),
                       ),
-                      const SizedBox(height: 8),
-                      // Date Picker for health metric date
-                      FormBuilderDateTimePicker(
-                        name: "date",
-                        decoration: InputDecoration(
-                          labelText: 'Date of Registration',
-                          labelStyle: const TextStyle(color: Colors.blue),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        inputType: InputType.date,
-                        validator: FormBuilderValidators.required(),
-                      ),
-                      const SizedBox(height: 8),
-                      // Text Fields for Health Metrics
-                      _buildNumericInputField(
-                          "systolicBP", "Systolic Blood Pressure"),
-                      const SizedBox(height: 8),
-                      _buildNumericInputField(
-                          "diastolicBP", "Diastolic Blood Pressure"),
-                      const SizedBox(height: 8),
-                      _buildNumericInputField("heartRate", "Heart Rate"),
-                      const SizedBox(height: 8),
-                      _buildNumericInputField("weight", "Weight"),
-                      const SizedBox(height: 8),
-                      _buildNumericInputField("bloodSugar", "Blood Sugar"),
-                    ],
-                  ),
-                ),
               ),
               // Action buttons (Cancel and Save)
               Padding(
@@ -160,7 +173,7 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
                         child: const Text("Cancel"),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 16.0), // Corrected SizedBox
                     Expanded(
                       child: ElevatedButton(
                         onPressed: _isPerforming
@@ -195,10 +208,25 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
                                       .addHealthMetric(newHealthMetric);
                                 }
                               },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                         child: _isPerforming
-                            ? const CircularProgressIndicator(
-                                color: Colors.white)
-                            : const Text('Save'),
+                            ? const Center(
+                                child: SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth:
+                                        2, // Optional: Adjust thickness
+                                  ),
+                                ),
+                              )
+                            : const Text('Add Patient'),
                       ),
                     ),
                   ],

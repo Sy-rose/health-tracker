@@ -12,7 +12,7 @@ import 'package:health_metrics_tracker/healthmetric%20managment/presentation/vie
 import 'package:intl/intl.dart';
 
 class ViewAllHealthMetricsPage extends StatefulWidget {
-  const ViewAllHealthMetricsPage({Key? key}) : super(key: key);
+  const ViewAllHealthMetricsPage({super.key});
 
   @override
   State<ViewAllHealthMetricsPage> createState() =>
@@ -27,8 +27,12 @@ class _ViewAllHealthMetricsPageState extends State<ViewAllHealthMetricsPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _healthMetricCubit = context.read<HealthMetricCubit>();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
     _healthMetricCubit.getAllHealthMetrics();
-    _fetchPatients();
+    await _fetchPatients();
   }
 
   Future<void> _fetchPatients() async {
@@ -119,7 +123,7 @@ class _ViewAllHealthMetricsPageState extends State<ViewAllHealthMetricsPage> {
                               ),
                             ).then((shouldRefresh) {
                               if (shouldRefresh == true) {
-                                _healthMetricCubit.getAllHealthMetrics();
+                                _fetchData();
                               }
                             });
                           },
@@ -134,7 +138,7 @@ class _ViewAllHealthMetricsPageState extends State<ViewAllHealthMetricsPage> {
                                     healthMetric: metric),
                               ),
                             ).then((_) {
-                              _healthMetricCubit.getAllHealthMetrics();
+                              _fetchData();
                             });
                           },
                         ),
@@ -160,7 +164,7 @@ class _ViewAllHealthMetricsPageState extends State<ViewAllHealthMetricsPage> {
               imageAssetName: 'assets/images/error.png',
               errorMessage: state.message,
               onRetry: () {
-                _healthMetricCubit.getAllHealthMetrics();
+                _fetchData();
               },
               message: 'An error occurred while loading the health metrics.',
             );
@@ -182,7 +186,7 @@ class _ViewAllHealthMetricsPageState extends State<ViewAllHealthMetricsPage> {
             ),
           );
           if (result == true) {
-            _healthMetricCubit.getAllHealthMetrics();
+            _fetchData();
           }
         },
         backgroundColor: Colors.blue,
