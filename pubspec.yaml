@@ -77,6 +77,8 @@ flutter:
     - assets/raymond.png
     - assets/sairose.png
     - assets/pngegg.png
+    - assets/noPatient.jpeg
+    - assets/healthmetric.png
     - assets/error.png
     
   # To add assets to your application, add an assets section, like this:

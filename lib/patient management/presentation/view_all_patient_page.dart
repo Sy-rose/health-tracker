@@ -60,7 +60,7 @@ class _ViewAllPatientsPageState extends State<ViewAllPatientsPage> {
               return const EmptyStateList(
                 imageAssetName: 'assets/Designer.png',
                 title: 'No Patients Found',
-                description: 'Please add new patients.',
+                description: 'Please add new .',
               );
             }
 
@@ -147,9 +147,9 @@ class _ViewAllPatientsPageState extends State<ViewAllPatientsPage> {
             );
           } else {
             return const EmptyStateList(
-              imageAssetName: 'assets/Designer.png',
+              imageAssetName: 'assets/noPatient.jpeg',
               title: 'No Patients Found',
-              description: 'Please add new patients.',
+              description: 'Please add new patient.',
             );
           }
         },
