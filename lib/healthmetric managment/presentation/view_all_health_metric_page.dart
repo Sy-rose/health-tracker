@@ -73,7 +73,7 @@ class _ViewAllHealthMetricsPageState extends State<ViewAllHealthMetricsPage> {
           } else if (state is HealthMetricLoaded) {
             if (state.healthMetrics.isEmpty) {
               return const EmptyStateList(
-                imageAssetName: 'assets/Designer.png',
+                imageAssetName: 'assets/healthmetric.png',
                 title: 'No Health Metrics Found',
                 description: 'Please add new health metrics.',
               );
@@ -170,7 +170,7 @@ class _ViewAllHealthMetricsPageState extends State<ViewAllHealthMetricsPage> {
             );
           } else {
             return const EmptyStateList(
-              imageAssetName: 'assets/Designer.png',
+              imageAssetName: 'assets/healthmetric.png',
               title: 'No Health Metrics Found',
               description: 'Please add new health metrics.',
             );

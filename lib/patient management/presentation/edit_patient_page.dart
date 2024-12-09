@@ -24,15 +24,29 @@ class _EditPatientPageState extends State<EditPatientPage> {
     return BlocListener<PatientCubit, PatientState>(
       listener: (context, state) {
         if (state is PatientUpdated) {
+          // Show a success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "Patient ${widget.patient.name} updated successfully!",
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+
           // After successful update, navigate back and refresh the list
-          Navigator.pop(context, true); // Pass 'true' to refresh the list
+          Navigator.pop(context, true);
         } else if (state is PatientError) {
           // Show error message in a SnackBar
-          final snackBar = SnackBar(
-            content: Text(state.message),
-            duration: const Duration(seconds: 5),
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              duration: const Duration(seconds: 5),
+            ),
           );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
           setState(() {
             _isPerforming = false;
           });
@@ -92,7 +106,8 @@ class _EditPatientPageState extends State<EditPatientPage> {
                         validator: FormBuilderValidators.compose([
                           FormBuilderValidators.required(),
                           FormBuilderValidators.numeric(),
-                          FormBuilderValidators.min(1, errorText: "Invalid age"),
+                          FormBuilderValidators.min(1,
+                              errorText: "Invalid age"),
                         ]),
                       ),
                       const SizedBox(height: 8),
@@ -139,7 +154,8 @@ class _EditPatientPageState extends State<EditPatientPage> {
                         onPressed: _isPerforming
                             ? null
                             : () {
-                                Navigator.pop(context); // Go back to previous page
+                                Navigator.pop(
+                                    context); // Go back to previous page
                               },
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.blue),
@@ -156,7 +172,8 @@ class _EditPatientPageState extends State<EditPatientPage> {
                         onPressed: _isPerforming
                             ? null
                             : () {
-                                final isValid = _formKey.currentState!.saveAndValidate();
+                                final isValid =
+                                    _formKey.currentState!.saveAndValidate();
                                 final inputs = _formKey.currentState!.value;
 
                                 if (isValid) {
@@ -169,10 +186,13 @@ class _EditPatientPageState extends State<EditPatientPage> {
                                     name: inputs["name"] as String,
                                     age: int.parse(inputs["age"] as String),
                                     gender: inputs["gender"] as String,
-                                    contactInfo: inputs["contactInfo"] as String,
+                                    contactInfo:
+                                        inputs["contactInfo"] as String,
                                   );
 
-                                  context.read<PatientCubit>().editPatient(updatedPatient);
+                                  context
+                                      .read<PatientCubit>()
+                                      .editPatient(updatedPatient);
                                 }
                               },
                         style: ElevatedButton.styleFrom(

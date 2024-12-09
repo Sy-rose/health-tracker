@@ -58,13 +58,7 @@ class _DeleteHealthMetricPageState extends State<DeleteHealthMetricPage> {
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Deleting Health Metric...'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
+              Navigator.of(context).pop(); // Close the dialog
               context
                   .read<HealthMetricCubit>()
                   .deleteHealthMetric(widget.healthMetric.id);
@@ -82,14 +76,22 @@ class _DeleteHealthMetricPageState extends State<DeleteHealthMetricPage> {
       listener: (context, state) {
         if (state is HealthMetricDelete) {
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Health Metric for ${widget.healthMetric.patientId} Deleted Successfully!'),
+              backgroundColor: Colors.red,
+            ),
+          );
           Navigator.pop(
               context, 'Health Metric Deleted'); // Redirects after deletion
         } else if (state is HealthMetricError) {
-          final snackBar = SnackBar(
-            content: Text(state.message),
-            duration: const Duration(seconds: 5),
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.red,
+            ),
           );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
       },
       child: Scaffold(
@@ -149,19 +151,40 @@ class _DeleteHealthMetricPageState extends State<DeleteHealthMetricPage> {
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 30),
-                    ElevatedButton(
-                      onPressed: () =>
-                          _showDeleteConfirmationDialog(snapshot.data!),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red, // Red color for button
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 30),
-                      ),
-                      child: const Text(
-                        "Delete Health Metric",
-                        style: TextStyle(fontSize: 18),
-                      ),
+                    BlocBuilder<HealthMetricCubit, HealthMetricState>(
+                      builder: (context, state) {
+                        bool isDeleting = state is HealthMetricLoading;
+                        return ElevatedButton(
+                          onPressed: isDeleting
+                              ? null
+                              : () =>
+                                  _showDeleteConfirmationDialog(snapshot.data!),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red, // Red color for button
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 30),
+                          ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              const Text(
+                                "Delete Health Metric",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              if (isDeleting)
+                                const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

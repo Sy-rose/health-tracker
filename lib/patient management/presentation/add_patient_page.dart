@@ -52,7 +52,10 @@ class _AddPatientPageState extends State<AddPatientPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Add New Patient"),
+          title: const Text(
+            "Add New Patient",
+            style: TextStyle(color: Colors.white), // Set text color to white
+          ),
           backgroundColor: Colors.blue,
         ),
         body: Padding(
@@ -167,7 +170,6 @@ class _AddPatientPageState extends State<AddPatientPage> {
                                     _isPerforming = true;
                                   });
 
-                                  
                                   final newPatient = Patient(
                                     id: '', // Placeholder ID
                                     name: formattedName,

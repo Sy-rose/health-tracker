@@ -56,8 +56,25 @@ class _EditHealthMetricPageState extends State<EditHealthMetricPage> {
     return BlocListener<HealthMetricCubit, HealthMetricState>(
       listener: (context, state) {
         if (state is HealthMetricUpdated) {
-          // After successful update, navigate back and refresh the list
-          Navigator.pop(context, true); // Pass 'true' to refresh the list
+          // Show success message in a SnackBar after update completes
+          final patientName = patients.firstWhere(
+            (p) => p['id'] == widget.healthMetric.patientId,
+            orElse: () => {'name': 'Patient'},
+          )['name'];
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "Health Metric for $patientName updated successfully!",
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+
+          // Navigate back and refresh the list
+          Navigator.pop(context, true);
         } else if (state is HealthMetricError) {
           // Show error message in a SnackBar
           final snackBar = SnackBar(
@@ -100,7 +117,7 @@ class _EditHealthMetricPageState extends State<EditHealthMetricPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        hint: Text('Select Patient'),
+                        hint: const Text('Select Patient'),
                         items: patients
                             .map((patient) => DropdownMenuItem<String>(
                                   value: patient['id'],
@@ -206,7 +223,6 @@ class _EditHealthMetricPageState extends State<EditHealthMetricPage> {
                           FormBuilderValidators.numeric(),
                         ]),
                       ),
-                      const SizedBox(height: 8),
                     ],
                   ),
                 ),
@@ -217,13 +233,10 @@ class _EditHealthMetricPageState extends State<EditHealthMetricPage> {
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: _isPerforming
-                            ? null
-                            : () {
-                                Navigator.pop(context);
-                              },
+                        onPressed:
+                            _isPerforming ? null : () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: Colors.blue),
+                          side: const BorderSide(color: Colors.blue),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -236,64 +249,33 @@ class _EditHealthMetricPageState extends State<EditHealthMetricPage> {
                       child: ElevatedButton(
                         onPressed: _isPerforming
                             ? null
-                            : () async {
-                                bool isValid =
-                                    _formKey.currentState!.validate();
-                                final inputs =
-                                    _formKey.currentState!.instantValue;
+                            : () {
+                                final isValid =
+                                    _formKey.currentState!.saveAndValidate();
+                                final inputs = _formKey.currentState!.value;
 
                                 if (isValid) {
-                                  setState(() {
-                                    _isPerforming = true;
-                                  });
+                                  setState(() => _isPerforming = true);
 
                                   final updatedHealthMetric = HealthMetric(
                                     id: widget.healthMetric.id,
                                     patientId: inputs["patientId"].toString(),
                                     date: inputs["date"] as DateTime,
-                                    systolicBP: double.tryParse(
-                                            inputs["systolicBP"].toString()) ??
-                                        0.0,
-                                    diastolicBP: double.tryParse(
-                                            inputs["diastolicBP"].toString()) ??
-                                        0.0,
-                                    heartRate: double.tryParse(
-                                            inputs["heartRate"].toString()) ??
-                                        0.0,
-                                    weight: double.tryParse(
-                                            inputs["weight"].toString()) ??
-                                        0.0,
-                                    bloodSugar: double.tryParse(
-                                            inputs["bloodSugar"].toString()) ??
-                                        0.0,
+                                    systolicBP: double.parse(
+                                        inputs["systolicBP"].toString()),
+                                    diastolicBP: double.parse(
+                                        inputs["diastolicBP"].toString()),
+                                    heartRate: double.parse(
+                                        inputs["heartRate"].toString()),
+                                    weight: double.parse(
+                                        inputs["weight"].toString()),
+                                    bloodSugar: double.parse(
+                                        inputs["bloodSugar"].toString()),
                                   );
 
-                                  // Perform the edit operation
-                                  await context
+                                  context
                                       .read<HealthMetricCubit>()
                                       .editHealthMetric(updatedHealthMetric);
-
-                                  // Show a success message
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        "${patients.firstWhere((p) => p['id'] == inputs['patientId'])['name']} updated successfully!",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      backgroundColor: Colors.green,
-                                      duration: Duration(
-                                          seconds:
-                                              2), // Display the SnackBar for 2 seconds
-                                    ),
-                                  );
-
-                                  Navigator.pop(context);
-
-                                  setState(() {
-                                    _isPerforming = false;
-                                  });
-
-                                  Navigator.pop(context);
                                 }
                               },
                         style: ElevatedButton.styleFrom(
@@ -303,14 +285,13 @@ class _EditHealthMetricPageState extends State<EditHealthMetricPage> {
                           ),
                         ),
                         child: _isPerforming
-                            ? SizedBox(
+                            ? const SizedBox(
                                 width: 16,
                                 height: 16,
                                 child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                ),
+                                    color: Colors.white),
                               )
-                            : Text("Update Health Metric"),
+                            : const Text("Update Health Metric"),
                       ),
                     ),
                   ],

@@ -28,6 +28,7 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
 
   List<Map<String, dynamic>> patients = []; // List of patients from Firestore
   bool _isFetchingPatients = false;
+  String _selectedPatientName = ''; // Track selected patient name
 
   @override
   void initState() {
@@ -65,7 +66,8 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
         if (state is HealthMetricAdded) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text("Health Metric added successfully."),
+              content: Text(
+                  "Health Metric for $_selectedPatientName added successfully."),
               backgroundColor: Colors.green,
             ),
           );
@@ -84,7 +86,10 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Add New Health Metric"),
+          title: const Text(
+            "Add New Health Metric",
+            style: TextStyle(color: Colors.white),
+          ),
           backgroundColor: Colors.blue,
         ),
         body: Padding(
@@ -116,11 +121,17 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
                                         value: patient['id'],
                                         child: Text(
                                             capitalizeName(patient['name'])),
+                                        onTap: () {
+                                          setState(() {
+                                            _selectedPatientName =
+                                                capitalizeName(patient['name']);
+                                          });
+                                        },
                                       ))
                                   .toList(),
                               validator: FormBuilderValidators.required(),
                             ),
-                            const SizedBox(height: 16.0), // Corrected SizedBox
+                            const SizedBox(height: 16.0),
                             // Date Picker for health metric date
                             FormBuilderDateTimePicker(
                               name: "date",
@@ -134,18 +145,18 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
                               inputType: InputType.date,
                               validator: FormBuilderValidators.required(),
                             ),
-                            const SizedBox(height: 16.0), // Corrected SizedBox
+                            const SizedBox(height: 16.0),
                             // Text Fields for Health Metrics
                             _buildNumericInputField(
                                 "systolicBP", "Systolic Blood Pressure"),
-                            const SizedBox(height: 16.0), // Corrected SizedBox
+                            const SizedBox(height: 16.0),
                             _buildNumericInputField(
                                 "diastolicBP", "Diastolic Blood Pressure"),
-                            const SizedBox(height: 16.0), // Corrected SizedBox
+                            const SizedBox(height: 16.0),
                             _buildNumericInputField("heartRate", "Heart Rate"),
-                            const SizedBox(height: 16.0), // Corrected SizedBox
+                            const SizedBox(height: 16.0),
                             _buildNumericInputField("weight", "Weight"),
-                            const SizedBox(height: 16.0), // Corrected SizedBox
+                            const SizedBox(height: 16.0),
                             _buildNumericInputField(
                                 "bloodSugar", "Blood Sugar"),
                           ],
@@ -159,11 +170,8 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: _isPerforming
-                            ? null
-                            : () {
-                                Navigator.pop(context);
-                              },
+                        onPressed:
+                            _isPerforming ? null : () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.blue),
                           shape: RoundedRectangleBorder(
@@ -173,7 +181,7 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
                         child: const Text("Cancel"),
                       ),
                     ),
-                    const SizedBox(width: 16.0), // Corrected SizedBox
+                    const SizedBox(width: 16.0),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: _isPerforming
@@ -221,12 +229,11 @@ class _AddHealthMetricPageState extends State<AddHealthMetricPage> {
                                   height: 16,
                                   child: CircularProgressIndicator(
                                     color: Colors.white,
-                                    strokeWidth:
-                                        2, // Optional: Adjust thickness
+                                    strokeWidth: 2,
                                   ),
                                 ),
                               )
-                            : const Text('Add Patient'),
+                            : const Text('Add Health Metric'),
                       ),
                     ),
                   ],

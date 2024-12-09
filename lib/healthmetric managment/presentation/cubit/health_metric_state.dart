@@ -26,9 +26,13 @@ class HealthMetricLoaded extends HealthMetricState {
   List<Object?> get props => [healthMetrics];
 }
 
-class HealthMetricAdded extends HealthMetricState {}
+class HealthMetricAdded extends HealthMetricState {
+  get healthMetric => null;
+}
 
-class HealthMetricDelete extends HealthMetricState {}
+class HealthMetricDelete extends HealthMetricState {
+  get patientName => null;
+}
 
 class HealthMetricUpdated extends HealthMetricState {
   final HealthMetric newHealthMetric;
